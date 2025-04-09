@@ -1,4 +1,4 @@
-package com.svalero;
+package com.svalero.freegames;
 
 public class Main {
     public static void main(String[] args) {
