@@ -7,6 +7,9 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -14,31 +17,17 @@ import java.util.List;
 public class FreeGamesApp extends Application {
 
     @Override
-    public void start(Stage stage){
-        System.out.println("Initializing FreeGamesApp...");
-
-    FreeToGameService service = RetrofitClient.getService();
-        Observable<List<Game>> observable = service.getGames();
-
-        observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.single())
-                .subscribe(
-                    games -> {
-                    System.out.println("Games retrieved successfully:");
-                    for (Game game : games) {
-                        System.out.println("\uD83C\uDFAE" + game.getTitle());
-                    }
-                }, throwable -> {
-                    System.err.println("❌ Error: " + throwable.getMessage()
-                    );
-                }
-                );
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 800, 600);
+        stage.setTitle("FreeToPlay Explorer");
+        stage.setScene(scene);
+        stage.show();
     }
 
-        public static void main(String[] args) {
-            launch(args);
-
+    public static void main(String[] args) {
+        launch(args);
     }
-    }
+}
 
