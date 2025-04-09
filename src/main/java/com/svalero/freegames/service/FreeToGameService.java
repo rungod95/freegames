@@ -17,4 +17,6 @@ public interface FreeToGameService {
 
     @GET("games")
     Observable<List<Game>> getGamesByCategory(@Query("category") String category);
+
+
 }
