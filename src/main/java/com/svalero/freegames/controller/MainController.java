@@ -42,6 +42,9 @@ public class MainController {
     @FXML
     private ComboBox<String> categoryCombo;
 
+    @FXML
+    private javafx.scene.image.ImageView thumbnailImage;
+
     private final ObservableList<Game> allGames = FXCollections.observableArrayList();
     private final ObservableList<Game> filteredGames = FXCollections.observableArrayList();
 
@@ -60,6 +63,13 @@ public class MainController {
         platformCombo.setValue("All");
         categoryCombo.getItems().addAll("All", "Shooter", "MMORPG", "Strategy", "Racing", "Sports", "Card Game", "Fighting");
         categoryCombo.setValue("All");
+
+        gamesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                loadThumbnail(newSelection.getThumbnail());
+            }
+        });
+
 
         // Carga inicial de todos los juegos
         service.getGames()
@@ -126,6 +136,18 @@ public class MainController {
                 .toList()
         );
     }
+
+    private void loadThumbnail(String imageUrl) {
+        Platform.runLater(() -> {
+            try {
+                javafx.scene.image.Image image = new javafx.scene.image.Image(imageUrl, true);
+                thumbnailImage.setImage(image);
+            } catch (Exception e) {
+                System.err.println("❌ Error cargando imagen: " + e.getMessage());
+            }
+        });
+    }
+
 
 }
 

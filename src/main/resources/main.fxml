@@ -8,6 +8,7 @@
 
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.svalero.freegames.controller.MainController">
     <top>
         <HBox spacing="10">
@@ -23,6 +24,7 @@
     </top>
 
     <center>
+        <SplitPane orientation="VERTICAL">
         <TableView fx:id="gamesTable">
             <columns>
                 <TableColumn fx:id="titleColumn" text="Título" />
@@ -31,6 +33,8 @@
                 <TableColumn fx:id="publisherColumn" text="Publisher" />
             </columns>
         </TableView>
+            <ImageView fx:id="thumbnailImage" fitHeight="200" preserveRatio="true"/>
+        </SplitPane>
     </center>
 </BorderPane>
 
