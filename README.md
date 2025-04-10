@@ -45,13 +45,16 @@ Proyecto para la asignatura **Programación de Servicios y Procesos** – 2º DA
     mvn clean javafx:run`
    
 3. Requisitos:
- Tener Java 21 instalado
+   
+     Tener Java 21 instalado
 
- Tener configurado Maven
+     Tener configurado Maven
  
- IDE recomendado: IntelliJ IDEA   
+      IDE recomendado: IntelliJ IDEA
+   
 
-🎓 Autor
+## 🎓 Autor
+
 Javier R. (rungod95)
 
 Proyecto realizado como entrega de la 2ª Evaluación
