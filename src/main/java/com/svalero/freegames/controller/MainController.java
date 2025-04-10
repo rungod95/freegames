@@ -4,6 +4,7 @@ import com.svalero.freegames.model.Game;
 import com.svalero.freegames.service.FreeToGameService;
 import com.svalero.freegames.service.RetrofitClient;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,10 +13,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.application.Platform;
 
 import java.util.List;
-
 
 public class MainController {
 
@@ -40,14 +39,13 @@ public class MainController {
     @FXML
     private ComboBox<String> platformCombo;
 
-    private ObservableList<Game> gamesList = FXCollections.observableArrayList();
-    private ObservableList<Game> filteredGames= FXCollections.observableArrayList();
+    private final ObservableList<Game> allGames = FXCollections.observableArrayList();
+    private final ObservableList<Game> filteredGames = FXCollections.observableArrayList();
 
+    private final FreeToGameService service = RetrofitClient.getService();
 
     @FXML
-
     public void initialize() {
-
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         genreColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
         platformColumn.setCellValueFactory(new PropertyValueFactory<>("platform"));
@@ -55,48 +53,64 @@ public class MainController {
 
         gamesTable.setItems(filteredGames);
 
-        //Cargar plataformas
-        platformCombo.getItems().addAll("All", "PC (Windows)", "Web Browser", "PC (Windows), Web Browser");
+        platformCombo.getItems().addAll("All", "PC", "Browser");
         platformCombo.setValue("All");
 
-        // Load games from the API
-        FreeToGameService service = RetrofitClient.getService();
+        // Carga inicial de todos los juegos
         service.getGames()
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.single())
+            .subscribe(
+                this::loadGamesToTable,
+                error -> System.err.println("❌ Error cargando juegos: " + error.getMessage())
+            );
+    }
+
+    private void loadGamesToTable(List<Game> games) {
+        Platform.runLater(() -> {
+            allGames.clear();
+            allGames.addAll(games);
+            applyFilters();
+        });
+    }
+
+    @FXML
+    public void onSearchClicked() {
+        applyFilters();
+    }
+
+    @FXML
+    public void onPlatformSelected() {
+        String selected = platformCombo.getValue();
+
+        if (selected.equals("All")) {
+            // Obtener todos los juegos
+            service.getGames()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.single())
                 .subscribe(
-                    this::loadGamestoTable,
-                    error ->
-                        System.out.println("❌ Error " + error.getMessage())
+                    this::loadGamesToTable,
+                    error -> System.err.println("❌ Error al cargar todos los juegos: " + error.getMessage())
                 );
+        } else {
+            // Obtener juegos por plataforma desde la API
+            service.getGamesByPlatform(selected.toLowerCase())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.single())
+                .subscribe(
+                    this::loadGamesToTable,
+                    error -> System.err.println("❌ Error al filtrar por plataforma: " + error.getMessage())
+                );
+        }
     }
 
+    private void applyFilters() {
+        String searchText = searchField.getText().toLowerCase().trim();
 
-
-
-                private void loadGamestoTable(List<Game> games) {
-                            Platform.runLater(() -> {
-                            gamesList.clear();
-                            gamesList.addAll(games);
-                            applyFilters();
-                            });
-                        }
-                        @FXML
-                        public void onSearchClicked() {
-                            applyFilters();
-                        }
-
-                        private void applyFilters() {
-                            String searchText = searchField.getText().toLowerCase().trim();
-                            String selectedPlatform = platformCombo.getValue();
-
-                            filteredGames.setAll(
-                                gamesList.stream()
-                                    .filter(game -> game.getTitle().toLowerCase().contains(searchText))
-                                    .filter(game -> selectedPlatform.equals("All") || game.getPlatform().equals(selectedPlatform))
-                                    .toList()
-                            );
-                        }
-
-                }
-
+        filteredGames.setAll(
+            allGames.stream()
+                .filter(game -> game.getTitle().toLowerCase().contains(searchText))
+                .toList()
+        );
+    }
+}

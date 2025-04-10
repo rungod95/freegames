@@ -16,8 +16,8 @@
             </padding>
 
             <TextField fx:id="searchField" promptText="Buscar por título..." />
-            <ComboBox fx:id="platformCombo" promptText="Filtrar por plataforma..." />
-            <Button text="Buscar" onAction="#onSearchClicked"/>
+            <ComboBox fx:id="platformCombo" promptText="Filtrar por plataforma..." onAction="#onPlatformSelected" />
+                        <Button text="Buscar" onAction="#onSearchClicked"/>
         </HBox>
     </top>
 
