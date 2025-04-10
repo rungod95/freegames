@@ -7,12 +7,26 @@
 <?import javafx.scene.layout.*?>
 
 
+<?import javafx.geometry.Insets?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.svalero.freegames.controller.MainController">
+    <top>
+        <HBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <TextField fx:id="searchField" promptText="Buscar por título..." />
+            <ComboBox fx:id="platformCombo" promptText="Filtrar por plataforma..." onAction="#onPlatformSelected" />
+            <ComboBox fx:id="categoryCombo" promptText="Filtrar por Categoría..." onAction="#onCategorySelected" />
+            <Button text="Buscar" onAction="#onSearchClicked"/>
+        </HBox>
+    </top>
+
     <center>
         <TableView fx:id="gamesTable">
             <columns>
                 <TableColumn fx:id="titleColumn" text="Título" />
-                <TableColumn fx:id="genreColumn" text="Género" />
+                <TableColumn fx:id="genreColumn" text="Categoría" />
                 <TableColumn fx:id="platformColumn" text="Plataforma" />
                 <TableColumn fx:id="publisherColumn" text="Publisher" />
             </columns>
