@@ -55,7 +55,7 @@ Proyecto para la asignatura **Programación de Servicios y Procesos** – 2º DA
 
 ## 🎓 Autor
 
-Javier R. (rungod95)
+Javier Planas (rungod95)
 
 Proyecto realizado como entrega de la 2ª Evaluación
 
