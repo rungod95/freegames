@@ -46,7 +46,9 @@ Proyecto para la asignatura **Programación de Servicios y Procesos** – 2º DA
    
 3. Requisitos:
  Tener Java 21 instalado
+
  Tener configurado Maven
+ 
  IDE recomendado: IntelliJ IDEA   
 
 🎓 Autor
