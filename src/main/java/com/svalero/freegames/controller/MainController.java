@@ -39,6 +39,9 @@ public class MainController {
     @FXML
     private ComboBox<String> platformCombo;
 
+    @FXML
+    private ComboBox<String> categoryCombo;
+
     private final ObservableList<Game> allGames = FXCollections.observableArrayList();
     private final ObservableList<Game> filteredGames = FXCollections.observableArrayList();
 
@@ -55,6 +58,8 @@ public class MainController {
 
         platformCombo.getItems().addAll("All", "PC", "Browser");
         platformCombo.setValue("All");
+        categoryCombo.getItems().addAll("All", "Shooter", "MMORPG", "Strategy", "Racing", "Sports", "Card Game", "Fighting");
+        categoryCombo.setValue("All");
 
         // Carga inicial de todos los juegos
         service.getGames()
@@ -103,14 +108,25 @@ public class MainController {
                 );
         }
     }
+    @FXML
+    public void onCategorySelected() {
+        applyFilters();
+    }
+
 
     private void applyFilters() {
         String searchText = searchField.getText().toLowerCase().trim();
+        String selectedCategory = categoryCombo.getValue();
 
         filteredGames.setAll(
             allGames.stream()
                 .filter(game -> game.getTitle().toLowerCase().contains(searchText))
+                .filter(game -> selectedCategory.equals("All") ||
+                    game.getGenre().toLowerCase().contains(selectedCategory.toLowerCase()))
                 .toList()
         );
     }
+
 }
+
+
