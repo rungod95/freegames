@@ -1,7 +1,7 @@
 # FreeToPlay Explorer 🎮
 
 Aplicación JavaFX que consume la API de [FreeToGame](https://www.freetogame.com/api-doc) usando Retrofit y RxJava.  
-Proyecto para la asignatura **Programación de Servicios y Procesos** – 2º DAM (San Valero, 2025).
+Actividad de Aprendizaje para la asignatura **Programación de Servicios y Procesos** – 2º DAM (San Valero, 2025).
 
 ---
 
@@ -57,6 +57,6 @@ Proyecto para la asignatura **Programación de Servicios y Procesos** – 2º DA
 
 Javier Planas (rungod95)
 
-Proyecto realizado como entrega de la 2ª Evaluación
+Actividad de aprendizaje como entrega de la 2ª Evaluación
 
 IES San Valero, Zaragoza – Curso 2024/2025
