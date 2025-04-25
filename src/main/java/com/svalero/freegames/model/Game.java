@@ -1,5 +1,6 @@
 package com.svalero.freegames.model;
 
+
 public class Game {
 
     private int id;
@@ -7,7 +8,7 @@ public class Game {
     private String thumbnail;
     private String short_description;
     private String game_url;
-    private String category;
+    private String genre;
     private String platform;
     private String publisher;
     private String developer;
@@ -35,8 +36,8 @@ public class Game {
         return game_url;
     }
 
-    public String getCategory() {
-        return category;
+    public String getGenre() {
+        return genre;
     }
 
     public String getPlatform() {

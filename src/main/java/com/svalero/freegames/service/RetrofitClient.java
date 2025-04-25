@@ -6,18 +6,33 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    private static final String BASE_URL = "https://www.freetogame.com/api/";
-    private static Retrofit retrofit;
+    private static final String EXTERNAL_BASE_URL = "https://www.freetogame.com/api/";
+    private static final String LOCAL_BASE_URL = "http://localhost:8080/";
 
-    public static FreeToGameService getService() {
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+    private static Retrofit externalRetrofit;
+    private static Retrofit localRetrofit;
+
+
+    //
+    public static FreeToGameService getExternalService() {
+        if (externalRetrofit == null) {
+            externalRetrofit = new Retrofit.Builder()
+                .baseUrl(EXTERNAL_BASE_URL)
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
         }
-        return retrofit.create(FreeToGameService.class);
+        return externalRetrofit.create(FreeToGameService.class);
     }
 
+    public static FreeToGameService getLocalService() {
+        if (localRetrofit == null) {
+            localRetrofit = new Retrofit.Builder()
+                .baseUrl(LOCAL_BASE_URL)
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        }
+        return localRetrofit.create(FreeToGameService.class);
+    }
 }

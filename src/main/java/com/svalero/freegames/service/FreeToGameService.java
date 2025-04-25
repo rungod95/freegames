@@ -16,7 +16,11 @@ public interface FreeToGameService {
     Observable<List<Game>> getGamesByPlatform(@Query("platform") String platform);
 
     @GET("games")
-    Observable<List<Game>> getGamesByCategory(@Query("category") String category);
+    Observable<List<Game>> getGamesByGenre(@Query("genre") String genre);
+
+    @GET("filtered-games")
+    Observable<List<Game>> getGamesFromMicroservice(@Query("platform") String platform);
+
 
 
 }

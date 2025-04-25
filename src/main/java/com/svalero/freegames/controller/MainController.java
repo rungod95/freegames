@@ -36,7 +36,7 @@ public class MainController {
     private TableColumn<Game, String> titleColumn;
 
     @FXML
-    private TableColumn<Game, String> categoryColumn;
+    private TableColumn<Game, String> genreColumn;
 
     @FXML
     private TableColumn<Game, String> platformColumn;
@@ -51,7 +51,7 @@ public class MainController {
     private ComboBox<String> platformCombo;
 
     @FXML
-    private ComboBox<String> categoryCombo;
+    private ComboBox<String> genreCombo;
 
     @FXML
     private javafx.scene.image.ImageView thumbnailImage;
@@ -59,12 +59,15 @@ public class MainController {
     private final ObservableList<Game> allGames = FXCollections.observableArrayList();
     private final ObservableList<Game> filteredGames = FXCollections.observableArrayList();
 
-    private final FreeToGameService service = RetrofitClient.getService();
+    private final FreeToGameService externalService = RetrofitClient.getExternalService();
+    private final FreeToGameService localService = RetrofitClient.getLocalService();
 
+
+    /// Método para inicializar la tabla y cargar los datos
     @FXML
     public void initialize() {
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+        genreColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
         platformColumn.setCellValueFactory(new PropertyValueFactory<>("platform"));
         publisherColumn.setCellValueFactory(new PropertyValueFactory<>("publisher"));
 
@@ -72,8 +75,8 @@ public class MainController {
 
         platformCombo.getItems().addAll("All", "PC", "Browser");
         platformCombo.setValue("All");
-        categoryCombo.getItems().addAll("All", "Shooter", "MMORPG", "Strategy", "Racing", "Sports", "Card Game", "Fighting");
-        categoryCombo.setValue("All");
+        genreCombo.getItems().addAll("All", "Shooter", "MMORPG", "Strategy", "Racing", "Sports", "Card Game", "Fighting");
+        genreCombo.setValue("All");
 
         gamesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -82,8 +85,8 @@ public class MainController {
         });
 
 
-        // Carga inicial de todos los juegos
-        service.getGames()
+
+        externalService.getGames()
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.single())
             .subscribe(
@@ -92,6 +95,7 @@ public class MainController {
             );
     }
 
+    /// Método para cargar los juegos en la tabla
     private void loadGamesToTable(List<Game> games) {
         Platform.runLater(() -> {
             allGames.clear();
@@ -100,18 +104,18 @@ public class MainController {
         });
     }
 
+    /// Método para buscar juegos
     @FXML
     public void onSearchClicked() {
         applyFilters();
     }
-
+/// Método para filtrar por plataforma
     @FXML
     public void onPlatformSelected() {
         String selected = platformCombo.getValue();
 
         if (selected.equals("All")) {
-            // Obtener todos los juegos
-            service.getGames()
+            externalService.getGames()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.single())
                 .subscribe(
@@ -119,35 +123,38 @@ public class MainController {
                     error -> System.err.println("❌ Error al cargar todos los juegos: " + error.getMessage())
                 );
         } else {
-            // Obtener juegos por plataforma desde la API
-            service.getGamesByPlatform(selected.toLowerCase())
+            localService.getGamesFromMicroservice(selected.toLowerCase())
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.single())
                 .subscribe(
                     this::loadGamesToTable,
-                    error -> System.err.println("❌ Error al filtrar por plataforma: " + error.getMessage())
+                    error -> System.err.println("❌ Error al filtrar por plataforma desde microservicio: " + error.getMessage())
                 );
         }
     }
+
     @FXML
-    public void onCategorySelected() {
+    public void onGenreSelected() {
         applyFilters();
     }
 
-
+    /// Método para aplicar los filtros de búsqueda y género
     private void applyFilters() {
         String searchText = searchField.getText().toLowerCase().trim();
-        String selectedCategory = categoryCombo.getValue();
+        String selectedGenre = genreCombo.getValue();
 
         filteredGames.setAll(
             allGames.stream()
                 .filter(game -> game.getTitle().toLowerCase().contains(searchText))
-                .filter(game -> selectedCategory.equals("All") ||
-                    game.getCategory().toLowerCase().contains(selectedCategory.toLowerCase()))
-                .toList()
+                .filter(game -> selectedGenre.equals("All") ||
+                (game.getGenre() != null && game.getGenre().toLowerCase().contains(selectedGenre.toLowerCase())))
+
+            .toList()
         );
     }
 
+
+    /// Método para cargar la miniatura
     private void loadThumbnail(String imageUrl) {
         Platform.runLater(() -> {
             try {
@@ -159,6 +166,8 @@ public class MainController {
         });
     }
 
+
+    /// Método para exportar a CSV y comprimirlo
     @FXML
     public void onExportClicked() {
         CompletableFuture.runAsync(() -> {
@@ -175,14 +184,14 @@ public class MainController {
         String csvFile = "games.csv";
         String zipFile = "games.zip";
 
-        // Exportar a CSV
+        // Exporta a CSV
         try (FileWriter writer = new FileWriter(csvFile);
-        CSVPrinter csvPrinter = new CSVPrinter( writer, CSVFormat.DEFAULT.withHeader("Title", "Category", "Platform", "Publisher"))) {
+        CSVPrinter csvPrinter = new CSVPrinter( writer, CSVFormat.DEFAULT.withHeader("Title", "Genre", "Platform", "Publisher"))) {
             for (Game game : filteredGames) {
-                csvPrinter.printRecord(game.getTitle(), game.getCategory(), game.getPlatform(), game.getPublisher());
+                csvPrinter.printRecord(game.getTitle(), game.getGenre(), game.getPlatform(), game.getPublisher());
             }
         }
-        // Comprimir el archivo CSV
+        // Comprimi el archivo CSV
 
         try (FileOutputStream fos = new FileOutputStream(zipFile);
                 ZipOutputStream zipOut = new ZipOutputStream(fos)) {
@@ -192,7 +201,7 @@ public class MainController {
             Files.copy(csvPath, zipOut);
             zipOut.closeEntry();
         }
-        // Eliminar el archivo CSV original
+        // Elimina el archivo CSV original
         Files.deleteIfExists(Paths.get(csvFile));
     }
 
